@@ -162,4 +162,91 @@ cv2.destroyAllWindows()
 
     src.shape: (367, 550, 3)
     src.dtype: uint8
+
+
+## 3.5.  영상히스토그램 분석
+
+
+```python
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+```
+
+
+```python
+src = cv2.imread('./fig/lenna.bmp', cv2.IMREAD_GRAYSCALE)
+
+if src is None:
+    print('Image load failed!')
+    sys.exit()
     
+# cv2.calcHist(images, channels, mask, histSize, ranges[, hist[, accumulate]]) -> hist
+# images: 입력영상 리스트(리스트로 입력)
+# channels: 채널리스트, 3 채널의 경우 [0,1,2]
+# mask: 마스크 영상입력, 영상전체는 None으로 지정
+# histSize: 히스터그램 빈의 크기
+# range: 히스토그램의 최솟값과 최댓값
+# hist: 계산된 히스토그램, numpy.ndarray 타입
+# accumulate: 기존의 히스토그램을 누적할경우 True
+hist = cv2.calcHist([src], [0], None, [256], [0, 256])
+
+cv2.imshow('src', src)
+cv2.waitKey()
+
+cv2.destroyAllWindows()
+
+plt.plot(hist)
+plt.show()
+
+# 컬러 영상의 히스토그램
+src = cv2.imread('fig/lenna.bmp')
+
+if src is None:
+    print('Image load failed!')
+    sys.exit()
+
+
+# b, g, r = cv2.split(src)
+
+hist_b = cv2.calcHist([src], [0], None, [256], [0, 256])
+hist_g = cv2.calcHist([src], [1], None, [256], [0, 256])
+hist_r = cv2.calcHist([src], [2], None, [256], [0, 256])
+
+plt.plot(hist_b, color = "b")
+plt.plot(hist_g, color = "g")
+plt.plot(hist_r, color = "r")
+plt.show()
+
+
+# colors = ['b', 'g', 'r']
+# bgr_planes = cv2.split(src)
+# print(src)
+# print(bgr_planes)
+
+
+# for (p, c) in zip(bgr_planes, colors):
+#     hist = cv2.calcHist([p], [0], None, [256], [0, 256])
+#     plt.plot(hist, color=c)
+
+# cv2.imshow('src', src)
+# cv2.waitKey()
+
+# plt.show()
+
+# cv2.destroyAllWindows()
+
+```
+
+
+​    
+![png](output_13_0.png)
+​    
+
+
+
+
+![png](output_13_1.png)
+    
+
