@@ -229,7 +229,7 @@ cv2.destroyAllWindows()
 
     (600, 600, 3)
     (1125, 1500, 3)
-    
+
 
 ## 2.10. 알파 채널을 마스크 영상으로 이용
 
@@ -318,7 +318,7 @@ cv2.destroyAllWindows()
 ```
 
     Opencv version= 4.5.5
-    
+
 
 ## 2.12. 카메라와 동영상 처리하기 
 
@@ -349,9 +349,6 @@ while True:
 cap.release()
 cv2.destroyAllWindows()
 ```
-
-    video read failed
-    
 
 
 ```python
@@ -391,3 +388,140 @@ cap.release()
 out.release()
 cv2.destroyAllWindows()
 ```
+
+
+```python
+img = cv2.imread('./fig/cat.bmp', cv2.IMREAD_GRAYSCALE)
+
+if img is None:
+    print('Image load failed!')
+    sys.exit()
+
+cv2.namedWindow('image')
+cv2.imshow('image', img)
+
+# cv2.waitKeyEx()
+
+while True:
+    
+    keycode = cv2.waitKey()
+    
+    if keycode == ord('i'):
+        img = ~img        
+        cv2.imshow('image', img)
+    
+    elif keycode == ord('e'):
+        img = cv2.Canny(img, 50, 150)
+        
+        cv2.imshow('image', img)
+    
+    elif keycode == 27:
+        break
+
+cv2.destroyAllWindows()
+```
+
+## 2.13. 마우스 이벤트 처리하기
+
+
+```python
+oldx = oldy = 0
+
+def call_mouse(event, x, y, flags, param):
+    global oldx, oldy
+
+    if event == cv2.EVENT_LBUTTONDOWN:
+        oldx, oldy = x, y
+        print('EVENT_LBUTTONDOWN: %d, %d' % (x, y))
+
+    elif event == cv2.EVENT_LBUTTONUP:
+        print('EVENT_LBUTTONUP: %d, %d' % (x, y))
+
+    elif event == cv2.EVENT_MOUSEMOVE:
+        if flags & cv2.EVENT_FLAG_LBUTTON:
+            cv2.line(img, (oldx, oldy), (x, y), (0, 0, 255), 4, cv2.LINE_AA)
+            cv2.imshow('image', img)
+            oldx, oldy = x, y
+
+
+img = np.ones((480, 640, 3), dtype=np.uint8) * 255
+
+cv2.namedWindow('image')
+
+# cv2.setMouseCallback(windowName, onMouse, param = None) -> None
+    # windowName: 마우스이벤트를 수행할 창 이름
+    # onMouse: 마우스 이벤트 콜벡함수
+    # param: 콜백함수에 전달할 데이터
+
+# onMouse(event, x, y, flags, param) -> None
+# event: 마우스 이벤트 종류 e.g., cv2.EVENT_LBUTTONDOWN
+# x, y : 창을 기준으로 이벤트 발생좌표
+# flags: 이벤트시 발생 상태 e.g., "ctrl"
+# param: cv2.setMouseCallback()함수에서 설정한 데이터
+
+# 마우스 event와 flags reference
+# docs/opencv.org/master -> MouseEventTypes cv, MouseEventFlags cv
+
+cv2.setMouseCallback('image',call_mouse, img)
+cv2.imshow('image', img)
+
+cv2.waitKey()
+cv2.destroyAllWindows()
+```
+
+    EVENT_LBUTTONDOWN: 175, 112
+    EVENT_LBUTTONUP: 380, 154
+
+
+## 2.14. 트랙바 사용하기
+
+
+```python
+def call_trackbar(pos):
+    print(pos)
+    value = 256
+#     if value >= 255:
+#         value = 255
+#     value = np.clip(value,0,255)
+
+    img[:] = pos
+    cv2.imshow('image', img)
+
+img = np.zeros((480, 640), np.uint8)
+cv2.namedWindow('image')
+
+# createTrackbar(trackbarName, windowName, value, count, onChange) -> None
+# trackbarName: 트랙바 이름
+# windowName : 트랙바를 생성할 창 이름
+# value : 트랙바 위치 초기값
+# count : 트랙바 최댓값, 최솟값은 0
+# onChange :callback 함수 e.g., onChange(pos) 위치를 정수형태로 전달
+cv2.createTrackbar('level', 'image', 0, 256, call_trackbar) # 창이 생성된 후 호출
+
+cv2.imshow('image', img)
+cv2.waitKey()
+cv2.destroyAllWindows()
+```
+
+
+```python
+def call_track(pos):
+    global img
+    
+    img_glass=img*pos
+    cv2.imshow('image',img_glass)
+
+img_alpha=cv2.imread('./fig/imgbin_sunglasses_1.png',cv2.IMREAD_UNCHANGED)
+img=img_alpha[:,:,-1]
+
+img[img>0]=1
+
+cv2.namedWindow('image',cv2.WINDOW_NORMAL)
+cv2.imshow('image',img)
+cv2.createTrackbar('level','image',0,255,call_track)
+
+cv2.waitKey()
+cv2.destroyAllWindows()
+```
+
+
